@@ -20,6 +20,7 @@ class _CustomMemoryScreenState extends State<CustomMemoryScreen> {
   final _nameController = TextEditingController();
   String _memoryType = 'date'; // 'date' or 'option'
   String? _selectedOption;
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _CustomMemoryScreenState extends State<CustomMemoryScreen> {
       _nameController.text = widget.existingMemory!.name;
       _memoryType = widget.existingMemory!.payload['type'] ?? 'date';
       _selectedOption = widget.existingMemory!.payload['value'];
+      _selectedDate = widget.existingMemory!.createdAt;
     }
   }
 
@@ -55,7 +57,7 @@ class _CustomMemoryScreenState extends State<CustomMemoryScreen> {
         'type': _memoryType,
         if (_selectedOption != null) 'value': _selectedOption,
       },
-      createdAt: widget.existingMemory?.createdAt,
+      createdAt: _selectedDate ?? widget.existingMemory?.createdAt ?? DateTime.now(),
     );
 
     if (widget.existingMemory != null) {
@@ -160,6 +162,52 @@ class _CustomMemoryScreenState extends State<CustomMemoryScreen> {
                   hintText: '예: 완료, 미완료 등',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+
+            // Date selector (only in edit mode)
+            if (widget.existingMemory != null) ...[
+              Text(
+                '날짜',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate ?? widget.existingMemory!.createdAt,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _selectedDate = pickedDate;
+                    });
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 20, color: Colors.grey.shade600),
+                      const SizedBox(width: 12),
+                      Text(
+                        _selectedDate != null
+                            ? DateFormat('yyyy년 M월 d일').format(_selectedDate!)
+                            : DateFormat('yyyy년 M월 d일').format(widget.existingMemory!.createdAt),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
                 ),
               ),

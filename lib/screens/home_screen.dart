@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final provider = Provider.of<MemoryProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         title: const Text('Memory Agent'),
         actions: [
@@ -54,13 +55,31 @@ class _HomeScreenState extends State<HomeScreen> {
               onRefresh: () => provider.loadMemories(),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Large title section
+                    const Text(
+                      'Your\nMemories',
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        height: 1.2,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
                     // Reminder banner
                     if (provider.shouldShowRazorReminder())
-                      ReminderBanner(
-                        razorMemory: provider.getLatestMemory(MemoryType.razor) as RazorMemory?,
-                        onDismiss: () => provider.dismissReminder(),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: ReminderBanner(
+                          razorMemory: provider.getLatestMemory(MemoryType.razor) as RazorMemory?,
+                          onDismiss: () => provider.dismissReminder(),
+                        ),
                       ),
 
                     // Memory cards
@@ -149,7 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),

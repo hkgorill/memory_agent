@@ -22,55 +22,57 @@ class MemoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Colors.black,
+                    size: 28,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: theme.colorScheme.primary,
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _buildSubtitle(context, theme),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey.shade400,
                   size: 24,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    _buildSubtitle(context, theme),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -81,8 +83,9 @@ class MemoryCard extends StatelessWidget {
     if (memory == null) {
       return Text(
         '기록 없음',
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade600,
         ),
       );
     }
@@ -108,7 +111,10 @@ class MemoryCard extends StatelessWidget {
           final zoneText = m.zone != null ? ' ${m.zone}' : '';
           return Text(
             '$placeLabel · ${m.floor}$zoneText',
-            style: theme.textTheme.bodyMedium,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade700,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           );
@@ -118,9 +124,26 @@ class MemoryCard extends StatelessWidget {
         if (memory is BeautyMemory) {
           final m = memory as BeautyMemory;
           final date = DateFormat('M월 d일').format(m.createdAt);
+          String serviceLabel;
+          switch (m.service) {
+            case 'cut':
+              serviceLabel = '컷트';
+              break;
+            case 'perm':
+              serviceLabel = '펌';
+              break;
+            case 'color':
+              serviceLabel = '염색';
+              break;
+            default:
+              serviceLabel = m.service;
+          }
           return Text(
-            '${m.service} · $date',
-            style: theme.textTheme.bodyMedium,
+            '$serviceLabel · $date',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade700,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           );
@@ -134,15 +157,19 @@ class MemoryCard extends StatelessWidget {
             if (days == 0) {
               return Text(
                 '오늘 교체일',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.error,
-                  fontWeight: FontWeight.w500,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
                 ),
               );
             } else {
               return Text(
                 '다음 교체까지 $days일',
-                style: theme.textTheme.bodyMedium,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade700,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               );
@@ -157,7 +184,10 @@ class MemoryCard extends StatelessWidget {
           if (days != null) {
             return Text(
               '$days일 전',
-              style: theme.textTheme.bodyMedium,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade700,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             );
@@ -170,7 +200,10 @@ class MemoryCard extends StatelessWidget {
           final date = DateFormat('M월 d일').format(m.createdAt);
           return Text(
             '$date',
-            style: theme.textTheme.bodyMedium,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade700,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           );
@@ -181,7 +214,10 @@ class MemoryCard extends StatelessWidget {
     final date = DateFormat('M월 d일').format(memory!.createdAt);
     return Text(
       date,
-      style: theme.textTheme.bodyMedium,
+      style: TextStyle(
+        fontSize: 14,
+        color: Colors.grey.shade700,
+      ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );

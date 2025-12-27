@@ -22,47 +22,55 @@ class ReminderBanner extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
-        ),
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.notifications_outlined,
-            color: theme.colorScheme.onPrimaryContainer,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.notifications_outlined,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   '면도날 교체 알림',
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onPrimaryContainer,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '오늘은 면도날을 교체할 날입니다',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.8),
                   ),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.close,
-              color: theme.colorScheme.onPrimaryContainer,
+              color: Colors.white,
               size: 20,
             ),
             onPressed: onDismiss,

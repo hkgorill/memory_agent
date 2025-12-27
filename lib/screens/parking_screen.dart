@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:intl/intl.dart';
 import '../models/memory.dart';
 import '../providers/memory_provider.dart';
 
@@ -22,6 +23,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
   final TextEditingController _zoneController = TextEditingController();
   String? _zoneImagePath;
   ParkingMemory? _currentMemory;
+  DateTime? _selectedDate;
 
   final List<Map<String, String>> _places = [
     {'value': 'home', 'label': '집'},
@@ -55,6 +57,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
         _selectedFloor = widget.existingMemory!.floor;
         _zoneController.text = widget.existingMemory!.zone ?? '';
         _zoneImagePath = widget.existingMemory!.zoneImagePath;
+        _selectedDate = widget.existingMemory!.createdAt;
       });
     } else {
       _loadLatestMemory();
@@ -159,7 +162,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
       floor: _selectedFloor!,
       zone: zoneText.isEmpty ? null : zoneText,
       zoneImagePath: _zoneImagePath,
-      createdAt: oldMemory?.createdAt,
+      createdAt: _selectedDate ?? oldMemory?.createdAt ?? DateTime.now(),
     );
 
     if (oldMemory != null) {
@@ -258,6 +261,53 @@ class _ParkingScreenState extends State<ParkingScreen> {
                 },
               ),
             const SizedBox(height: 24),
+
+            // Date selector (only in edit mode)
+            if (widget.existingMemory != null) ...[
+              Text(
+                '날짜',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate ?? widget.existingMemory!.createdAt,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _selectedDate = pickedDate;
+                    });
+                    _save();
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 20, color: Colors.grey.shade600),
+                      const SizedBox(width: 12),
+                      Text(
+                        _selectedDate != null
+                            ? DateFormat('yyyy년 M월 d일').format(_selectedDate!)
+                            : DateFormat('yyyy년 M월 d일').format(widget.existingMemory!.createdAt),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
 
             // Zone section (optional)
             if (_selectedFloor != null) ...[
