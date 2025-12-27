@@ -5,25 +5,67 @@ import '../models/memory.dart';
 import '../providers/memory_provider.dart';
 import '../utils/reminder_helper.dart';
 
-class RazorScreen extends StatelessWidget {
-  const RazorScreen({super.key});
+class RazorScreen extends StatefulWidget {
+  final RazorMemory? existingMemory;
 
-  Future<void> _replaceRazor(BuildContext context) async {
+  const RazorScreen({super.key, this.existingMemory});
+
+  @override
+  State<RazorScreen> createState() => _RazorScreenState();
+}
+
+class _RazorScreenState extends State<RazorScreen> {
+  DateTime? _selectedDate;
+  RazorMemory? _currentMemory;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingMemory != null) {
+      _currentMemory = widget.existingMemory;
+      setState(() {
+        _selectedDate = widget.existingMemory!.lastChangedAt;
+      });
+    }
+  }
+
+  Future<void> _replaceRazor() async {
     final provider = Provider.of<MemoryProvider>(context, listen: false);
+    final oldMemory = _currentMemory ?? widget.existingMemory;
     final memory = RazorMemory(
-      lastChangedAt: DateTime.now(),
+      id: oldMemory?.id,
+      lastChangedAt: _selectedDate ?? DateTime.now(),
+      cycle: oldMemory?.cycle ?? 'monthly',
+      notifyDay: oldMemory?.notifyDay ?? 1,
+      createdAt: oldMemory?.createdAt ?? DateTime.now(),
     );
 
-    await provider.addMemory(memory);
+    if (oldMemory != null) {
+      await provider.updateMemory(oldMemory, memory);
+      _currentMemory = memory;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('면도날 교체가 수정되었습니다'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } else {
+      await provider.addMemory(memory);
+      _currentMemory = memory;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('면도날 교체가 기록되었습니다'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    }
 
-    if (context.mounted) {
+    if (mounted) {
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('면도날 교체가 기록되었습니다'),
-          duration: Duration(seconds: 1),
-        ),
-      );
     }
   }
 
@@ -31,7 +73,7 @@ class RazorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final provider = Provider.of<MemoryProvider>(context);
-    final latest = provider.getLatestMemory(MemoryType.razor) as RazorMemory?;
+    final latest = widget.existingMemory ?? provider.getLatestMemory(MemoryType.razor) as RazorMemory?;
 
     return Scaffold(
       appBar: AppBar(
@@ -58,14 +100,16 @@ class RazorScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   if (latest != null) ...[
                     Text(
-                      '마지막 교체일',
+                      widget.existingMemory != null ? '교체일' : '마지막 교체일',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      DateFormat('yyyy년 M월 d일').format(latest.lastChangedAt),
+                      DateFormat('yyyy년 M월 d일').format(
+                        _selectedDate ?? latest.lastChangedAt,
+                      ),
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -115,6 +159,60 @@ class RazorScreen extends StatelessWidget {
               ),
             ),
 
+            // Date selector (only in edit mode)
+            if (widget.existingMemory != null) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '날짜',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: () async {
+                        final pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: _selectedDate ?? widget.existingMemory!.lastChangedAt,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            _selectedDate = pickedDate;
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today, size: 20, color: Colors.grey.shade600),
+                            const SizedBox(width: 12),
+                            Text(
+                              _selectedDate != null
+                                  ? DateFormat('yyyy년 M월 d일').format(_selectedDate!)
+                                  : DateFormat('yyyy년 M월 d일').format(widget.existingMemory!.lastChangedAt),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
             // Replace button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -122,11 +220,11 @@ class RazorScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton.icon(
-                  onPressed: () => _replaceRazor(context),
+                  onPressed: _replaceRazor,
                   icon: const Icon(Icons.check_circle_outline),
-                  label: const Text(
-                    '교체함',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  label: Text(
+                    widget.existingMemory != null ? '수정' : '교체함',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(

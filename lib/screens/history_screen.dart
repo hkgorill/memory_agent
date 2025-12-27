@@ -238,11 +238,13 @@ class HistoryScreen extends StatelessWidget {
               ],
               onSelected: (value) async {
                 if (value == 'edit') {
-                  // Beauty screen doesn't support edit mode yet, show message
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => BeautyScreen(existingMemory: memory),
+                    ),
+                  );
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('미용실 기록은 수정할 수 없습니다. 새로 기록해주세요.')),
-                    );
+                    provider.loadMemories();
                   }
                 } else if (value == 'delete') {
                   final confirmed = await showDialog<bool>(
@@ -317,6 +319,16 @@ class HistoryScreen extends StatelessWidget {
             trailing: PopupMenuButton(
               itemBuilder: (context) => [
                 const PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 20),
+                      SizedBox(width: 8),
+                      Text('수정'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
@@ -328,7 +340,16 @@ class HistoryScreen extends StatelessWidget {
                 ),
               ],
               onSelected: (value) async {
-                if (value == 'delete') {
+                if (value == 'edit') {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => RazorScreen(existingMemory: memory),
+                    ),
+                  );
+                  if (context.mounted) {
+                    provider.loadMemories();
+                  }
+                } else if (value == 'delete') {
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -415,6 +436,16 @@ class HistoryScreen extends StatelessWidget {
             trailing: PopupMenuButton(
               itemBuilder: (context) => [
                 const PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 20),
+                      SizedBox(width: 8),
+                      Text('수정'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
@@ -426,7 +457,16 @@ class HistoryScreen extends StatelessWidget {
                 ),
               ],
               onSelected: (value) async {
-                if (value == 'delete') {
+                if (value == 'edit') {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => CarWashScreen(existingMemory: memory),
+                    ),
+                  );
+                  if (context.mounted) {
+                    provider.loadMemories();
+                  }
+                } else if (value == 'delete') {
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
