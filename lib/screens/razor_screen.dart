@@ -32,7 +32,6 @@ class RazorScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final provider = Provider.of<MemoryProvider>(context);
     final latest = provider.getLatestMemory(MemoryType.razor) as RazorMemory?;
-    final histories = provider.getMemoriesByType(MemoryType.razor);
 
     return Scaffold(
       appBar: AppBar(
@@ -138,39 +137,6 @@ class RazorScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
-
-            // History
-            if (histories.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '히스토리',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...histories.map((memory) {
-                final m = memory as RazorMemory;
-                final date = DateFormat('yyyy년 M월 d일').format(m.lastChangedAt);
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.refresh,
-                      color: theme.colorScheme.primary,
-                    ),
-                    title: Text('교체일'),
-                    subtitle: Text(date),
-                  ),
-                );
-              }),
-            ],
           ],
         ),
       ),
