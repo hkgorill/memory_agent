@@ -25,14 +25,16 @@ abstract class Memory {
 
 class ParkingMemory extends Memory {
   final String place; // 'home' | 'office' | 'other'
-  final String floor; // 'B3' ~ '10F'
-  final String zone; // 'A'~'Z' | '1'~'20'
+  final String floor; // 'B5' ~ '6F'
+  final String? zone; // 텍스트 입력 (optional)
+  final String? zoneImagePath; // 이미지 경로 (optional)
 
   ParkingMemory({
     super.id,
     required this.place,
     required this.floor,
-    required this.zone,
+    this.zone,
+    this.zoneImagePath,
     super.createdAt,
   }) : super(type: MemoryType.parking);
 
@@ -43,6 +45,7 @@ class ParkingMemory extends Memory {
         'place': place,
         'floor': floor,
         'zone': zone,
+        'zoneImagePath': zoneImagePath,
         'createdAt': createdAt.toIso8601String(),
       };
 
@@ -52,6 +55,7 @@ class ParkingMemory extends Memory {
       place: json['place'],
       floor: json['floor'],
       zone: json['zone'],
+      zoneImagePath: json['zoneImagePath'],
       createdAt: DateTime.parse(json['createdAt']),
     );
   }

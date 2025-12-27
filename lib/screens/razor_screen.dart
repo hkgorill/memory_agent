@@ -52,7 +52,7 @@ class RazorScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Icon(
-                    Icons.content_cut,
+                    Icons.refresh,
                     size: 64,
                     color: theme.colorScheme.primary,
                   ),
@@ -162,7 +162,7 @@ class RazorScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: ListTile(
                     leading: Icon(
-                      Icons.content_cut,
+                      Icons.refresh,
                       color: theme.colorScheme.primary,
                     ),
                     title: Text('교체일'),

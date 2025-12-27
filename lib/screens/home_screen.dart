@@ -9,6 +9,7 @@ import 'beauty_screen.dart';
 import 'razor_screen.dart';
 import 'car_wash_screen.dart';
 import 'custom_memory_screen.dart';
+import 'history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,7 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () {
-              // TODO: History screen navigation
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const HistoryScreen(),
+                ),
+              );
             },
             tooltip: '히스토리',
           ),
@@ -97,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       memory: provider.getLatestMemory(MemoryType.razor),
                       type: MemoryType.razor,
                       title: '면도날 교체',
-                      icon: Icons.content_cut,
+                      icon: Icons.refresh,
                       onTap: () async {
                         await Navigator.of(context).push(
                           MaterialPageRoute(

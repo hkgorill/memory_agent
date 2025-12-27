@@ -75,6 +75,23 @@ class MemoryProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Delete memory
+  Future<void> deleteMemory(Memory memory) async {
+    _memories[memory.type]!.removeWhere((m) => m.id == memory.id);
+    await _storage.saveMemories(_memories);
+    notifyListeners();
+  }
+
+  // Update memory
+  Future<void> updateMemory(Memory oldMemory, Memory newMemory) async {
+    final index = _memories[oldMemory.type]!.indexWhere((m) => m.id == oldMemory.id);
+    if (index != -1) {
+      _memories[oldMemory.type]![index] = newMemory;
+      await _storage.saveMemories(_memories);
+      notifyListeners();
+    }
+  }
+
   // Initialize (load on app start)
   Future<void> initialize() async {
     await loadMemories();

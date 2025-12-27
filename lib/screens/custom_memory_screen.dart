@@ -49,23 +49,39 @@ class _CustomMemoryScreenState extends State<CustomMemoryScreen> {
 
     final provider = Provider.of<MemoryProvider>(context, listen: false);
     final memory = CustomMemory(
+      id: widget.existingMemory?.id,
       name: _nameController.text.trim(),
       payload: {
         'type': _memoryType,
         if (_selectedOption != null) 'value': _selectedOption,
       },
+      createdAt: widget.existingMemory?.createdAt,
     );
 
-    await provider.addMemory(memory);
+    if (widget.existingMemory != null) {
+      await provider.updateMemory(widget.existingMemory!, memory);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('커스텀 메모리가 수정되었습니다'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } else {
+      await provider.addMemory(memory);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('커스텀 메모리가 저장되었습니다'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    }
 
     if (mounted) {
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('커스텀 메모리가 저장되었습니다'),
-          duration: Duration(seconds: 1),
-        ),
-      );
     }
   }
 
